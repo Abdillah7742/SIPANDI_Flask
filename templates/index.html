@@ -3,79 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIPANDI Dashboard - Real-time</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <title>SIPANDI - Sistem Pemantauan Padi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌾</text></svg>">
-    <meta name="theme-color" content="#000000">
-    <link rel="manifest" href="/static/manifest.json">
-</head>
-<body>
-    <header>
-        <h1>SIPANDI</h1>
-        <p class="subtitle">Sistem Pemantauan Padi - Tana Toraja</p>
-        <span id="conn-status" class="status-indicator status-offline">🔴 Offline</span>
-    </header>
-
-    <main class="dashboard-grid">
-        <!-- Sensor Suhu -->
-        <section class="card">
-            <h2 class="card-title">🌡️ Suhu Udara</h2>
-            <div id="suhu-val" class="sensor-value">--<span class="unit">°C</span></div>
-            <p id="suhu-ts" class="subtitle">Memuat data...</p>
-        </section>
-
-        <!-- Sensor Kelembapan Udara -->
-        <section class="card">
-            <h2 class="card-title">💧 Lembab Udara</h2>
-            <div id="humi-val" class="sensor-value">--<span class="unit">%</span></div>
-            <p id="humi-ts" class="subtitle">Memuat data...</p>
-        </section>
-
-        <!-- Sensor Kelembapan Tanah -->
-        <section class="card">
-            <h2 class="card-title">🌱 Lembab Tanah</h2>
-            <div id="soil-val" class="sensor-value">--<span class="unit">%</span></div>
-            <p id="soil-ts" class="subtitle">Memuat data...</p>
-        </section>
-
-        <!-- Deteksi Hama -->
-        <section class="card" id="hama-card">
-            <h2 class="card-title">🦟 Status Hama</h2>
-            <div id="hama-status" class="sensor-value" style="color: var(--accent-color);">AMAN</div>
-            <p id="hama-dist" class="subtitle">Jarak: -- cm</p>
-        </section>
-
-        <!-- Kontrol Servo 1 (Lonceng) -->
-        <section class="card">
-            <h2 class="card-title">🔔 Kontrol Lonceng</h2>
-            <div class="control-group">
-                <button id="btn-ring" onclick="triggerServo1()">BUNYIKAN SEKARANG</button>
-                <p class="subtitle">Manual trigger Servo 1</p>
-            </div>
-        </section>
-
-        <!-- Kontrol Servo 2 (Sudut Ultrasonic) -->
-        <section class="card">
-            <h2 class="card-title">🔄 Sudut Pantau</h2>
-            <div class="control-group">
-                <input type="range" id="servo2-angle" min="0" max="180" value="90" oninput="updateServo2(this.value)">
-                <div class="subtitle" style="display: flex; justify-content: space-between;">
-                    <span>0°</span>
-                    <span id="angle-val">90°</span>
-                    <span>180°</span>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Firebase Library -->
-    <script type="module" src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
-    
     <script>
-        // Check for Service Worker support
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js');
-        }
+        tailwind.config = { theme: { extend: { colors: { primary: '#5ca904' } } } }
+    </script>
+</head>
+<body class="bg-slate-50 min-h-screen flex items-center justify-center p-6 transition-colors duration-500">
+    
+    <div class="text-center animate__animated animate__zoomIn">
+        <div class="inline-block p-6 bg-primary/10 rounded-[3rem] mb-6 animate__animated animate__bounce animate__infinite animate__slow">
+            <span class="text-6xl">🌾</span>
+        </div>
+        <h1 class="text-5xl font-black text-slate-900 tracking-tighter mb-2">SIPANDI</h1>
+        <p class="text-primary font-bold uppercase tracking-[0.3em] text-xs mb-10">Tana Toraja Smart Farming</p>
+        
+        <div class="flex flex-col items-center gap-4">
+            <div class="h-1.5 w-48 bg-slate-200 rounded-full overflow-hidden">
+                <div class="h-full bg-primary animate-pulse w-full"></div>
+            </div>
+            <p class="text-slate-400 text-[10px] font-bold tracking-widest uppercase">Menyiapkan koneksi aman...</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD_XxqrHpLMn7h9vFGwT2Zu7cxShGT1vOY",
+            authDomain: "sipandi-3d71d.firebaseapp.com",
+            databaseURL: "https://sipandi-3d71d-default-rtdb.firebaseio.com",
+            projectId: "sipandi-3d71d",
+            storageBucket: "sipandi-3d71d.firebasestorage.app",
+            messagingSenderId: "133803656199",
+            appId: "1:133803656199:web:51e5759ffd02a102a796a2",
+            measurementId: "G-Y5CFE0EZ29"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Langsung arahkan berdasarkan status login
+        onAuthStateChanged(auth, (user) => {
+            setTimeout(() => {
+                if (user) {
+                    window.location.href = "/devices";
+                } else {
+                    window.location.href = "/auth";
+                }
+            }, 1500);
+        });
     </script>
 </body>
 </html>
+ Riverside, CA
