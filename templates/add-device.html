@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Alat - SIPANDI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌾</text></svg>">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: { colors: { primary: '#5ca904', secondary: '#4d8e03' } }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #f8fafc; }
+        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(92, 169, 4, 0.1); }
+        #reader { border-radius: 2.5rem; overflow: hidden; border: 6px solid #5ca904 !important; }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 p-6 flex flex-col items-center">
+
+    <header class="w-full max-w-md flex items-center justify-between mb-10 animate__animated animate__fadeInDown">
+        <button onclick="history.back()" class="p-3 bg-white border border-slate-200 rounded-2xl hover:bg-primary hover:text-white transition-all group">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M15 19l-7-7 7-7" />
+            </svg>
+        </button>
+        <h1 class="text-xl font-black uppercase tracking-tight text-primary">TAMBAH ALAT</h1>
+        <div class="w-12"></div>
+    </header>
+
+    <main class="w-full max-w-md space-y-6">
+        <div class="glass p-8 rounded-[3rem] shadow-2xl relative animate__animated animate__zoomIn">
+            <p class="text-center text-slate-500 text-xs font-bold uppercase tracking-widest mb-8 px-4 leading-relaxed">Arahkan kamera ke QR Code<br>pada unit SIPANDI</p>
+            
+            <!-- Scanner Area -->
+            <div id="reader" class="w-full shadow-2xl shadow-primary/20"></div>
+            
+            <!-- Manual Input (Fallback) -->
+            <div class="mt-10 space-y-4">
+                <div class="relative flex items-center">
+                    <div class="flex-grow border-t border-slate-100"></div>
+                    <span class="px-4 text-[10px] text-slate-400 font-black uppercase tracking-widest">Atau Manual</span>
+                    <div class="flex-grow border-t border-slate-100"></div>
+                </div>
+                
+                <div class="flex flex-col space-y-3">
+                    <input id="device-id-input" type="text" placeholder="ID ALAT (Misal: DEV-01)" 
+                        class="w-full bg-white border border-slate-200 px-6 py-5 rounded-2xl focus:ring-2 focus:ring-primary outline-none text-slate-900 transition-all uppercase tracking-widest font-black text-sm">
+                    <button id="btn-add-manual" class="w-full bg-primary text-white py-5 rounded-2xl font-black tracking-widest uppercase hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20">
+                        SIMPAN PERANGKAT
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Modal (Hidden) -->
+        <div id="success-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/80 backdrop-blur-lg animate__animated animate__fadeIn">
+            <div class="glass p-10 rounded-[3rem] text-center max-w-sm animate__animated animate__bounceIn">
+                <div class="text-7xl mb-6 animate__animated animate__tada animate__infinite animate__slow">🌾</div>
+                <h2 class="text-2xl font-black text-slate-900 mb-2 uppercase">BERHASIL!</h2>
+                <p class="text-slate-500 mb-8 font-medium">Alat pemantau sudah terdaftar.</p>
+                <button onclick="window.location.href='/devices'" class="w-full py-5 bg-primary text-white font-black rounded-2xl shadow-xl shadow-primary/30 tracking-widest uppercase">
+                    LIHAT SAWAH SAYA
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Firebase SDK Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD_XxqrHpLMn7h9vFGwT2Zu7cxShGT1vOY",
+            authDomain: "sipandi-3d71d.firebaseapp.com",
+            databaseURL: "https://sipandi-3d71d-default-rtdb.firebaseio.com",
+            projectId: "sipandi-3d71d",
+            storageBucket: "sipandi-3d71d.firebasestorage.app",
+            messagingSenderId: "133803656199",
+            appId: "1:133803656199:web:51e5759ffd02a102a796a2",
+            measurementId: "G-Y5CFE0EZ29"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = "/auth";
+            } else {
+                currentUser = user;
+                initializeScanner();
+            }
+        });
+
+        async function addDeviceToAccount(deviceId) {
+            if (!currentUser) return;
+            try {
+                await setDoc(doc(db, `/users/${currentUser.uid}/devices`, deviceId), {
+                    name: "Alat Sawah Saya",
+                    added_at: serverTimestamp()
+                });
+                document.getElementById('success-modal').classList.remove('hidden');
+            } catch (err) {
+                alert("Gagal: " + err.message);
+            }
+        }
+
+        function initializeScanner() {
+            const html5QrCode = new Html5Qrcode("reader");
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+            html5QrCode.start({ facingMode: "environment" }, config, (decodedText) => {
+                let deviceId = decodedText;
+                try {
+                    const url = new URL(decodedText);
+                    deviceId = url.searchParams.get("id") || decodedText;
+                } catch(e) {}
+                html5QrCode.stop();
+                addDeviceToAccount(deviceId.toUpperCase());
+            });
+        }
+
+        document.getElementById('btn-add-manual').addEventListener('click', () => {
+            const id = document.getElementById('device-id-input').value;
+            if (id) addDeviceToAccount(id.toUpperCase());
+        });
+    </script>
+</body>
+</html>
+ Riverside, CA

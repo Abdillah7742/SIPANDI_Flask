@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIPANDI Dashboard - Real-time</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌾</text></svg>">
+    <meta name="theme-color" content="#000000">
+    <link rel="manifest" href="/static/manifest.json">
+</head>
+<body>
+    <header>
+        <h1>SIPANDI</h1>
+        <p class="subtitle">Sistem Pemantauan Padi - Tana Toraja</p>
+        <span id="conn-status" class="status-indicator status-offline">🔴 Offline</span>
+    </header>
+
+    <main class="dashboard-grid">
+        <!-- Sensor Suhu -->
+        <section class="card">
+            <h2 class="card-title">🌡️ Suhu Udara</h2>
+            <div id="suhu-val" class="sensor-value">--<span class="unit">°C</span></div>
+            <p id="suhu-ts" class="subtitle">Memuat data...</p>
+        </section>
+
+        <!-- Sensor Kelembapan Udara -->
+        <section class="card">
+            <h2 class="card-title">💧 Lembab Udara</h2>
+            <div id="humi-val" class="sensor-value">--<span class="unit">%</span></div>
+            <p id="humi-ts" class="subtitle">Memuat data...</p>
+        </section>
+
+        <!-- Sensor Kelembapan Tanah -->
+        <section class="card">
+            <h2 class="card-title">🌱 Lembab Tanah</h2>
+            <div id="soil-val" class="sensor-value">--<span class="unit">%</span></div>
+            <p id="soil-ts" class="subtitle">Memuat data...</p>
+        </section>
+
+        <!-- Deteksi Hama -->
+        <section class="card" id="hama-card">
+            <h2 class="card-title">🦟 Status Hama</h2>
+            <div id="hama-status" class="sensor-value" style="color: var(--accent-color);">AMAN</div>
+            <p id="hama-dist" class="subtitle">Jarak: -- cm</p>
+        </section>
+
+        <!-- Kontrol Servo 1 (Lonceng) -->
+        <section class="card">
+            <h2 class="card-title">🔔 Kontrol Lonceng</h2>
+            <div class="control-group">
+                <button id="btn-ring" onclick="triggerServo1()">BUNYIKAN SEKARANG</button>
+                <p class="subtitle">Manual trigger Servo 1</p>
+            </div>
+        </section>
+
+        <!-- Kontrol Servo 2 (Sudut Ultrasonic) -->
+        <section class="card">
+            <h2 class="card-title">🔄 Sudut Pantau</h2>
+            <div class="control-group">
+                <input type="range" id="servo2-angle" min="0" max="180" value="90" oninput="updateServo2(this.value)">
+                <div class="subtitle" style="display: flex; justify-content: space-between;">
+                    <span>0°</span>
+                    <span id="angle-val">90°</span>
+                    <span>180°</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Firebase Library -->
+    <script type="module" src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+    
+    <script>
+        // Check for Service Worker support
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js');
+        }
+    </script>
+</body>
+</html>
