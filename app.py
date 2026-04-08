@@ -6,8 +6,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    # Frontend JS will handle redirecting to /auth or /devices based on Firebase Auth state
-    return render_template("index.html")
+    return redirect(url_for("devices"))
 
 @app.route("/auth")
 def auth():
