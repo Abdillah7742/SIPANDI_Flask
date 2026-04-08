@@ -6,15 +6,11 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return redirect(url_for("devices"))
+    return render_template("devices.html")
 
 @app.route("/auth")
 def auth():
     return render_template("auth.html")
-
-@app.route("/devices")
-def devices():
-    return render_template("devices.html")
 
 @app.route("/add-device")
 def add_device():
@@ -31,3 +27,4 @@ def sw():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+ Riverside, CA

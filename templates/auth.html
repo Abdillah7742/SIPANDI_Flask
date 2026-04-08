@@ -128,7 +128,7 @@
         btnGoogle.addEventListener('click', async () => {
             try {
                 await signInWithPopup(auth, provider);
-                window.location.href = "/devices";
+                window.location.href = "/";
             } catch (error) {
                 console.error(error);
                 errorEl.innerText = error.message;
@@ -147,7 +147,7 @@
                 } else {
                     await createUserWithEmailAndPassword(auth, email, pass);
                 }
-                window.location.href = "/devices";
+                window.location.href = "/";
             } catch (error) {
                 errorEl.innerText = error.message;
                 errorEl.classList.remove('hidden');
@@ -155,7 +155,7 @@
         });
 
         onAuthStateChanged(auth, (user) => {
-            if (user) window.location.href = "/devices";
+            if (user) window.location.href = "/";
         });
     </script>
 </body>
