@@ -20,6 +20,10 @@ def add_device():
 def dashboard(device_id):
     return render_template("dashboard.html", device_id=device_id)
 
+@app.route("/simulator")
+def simulator():
+    return render_template("simulator.html")
+
 # Service Worker for Offline-First
 @app.route("/service-worker.js")
 def sw():
