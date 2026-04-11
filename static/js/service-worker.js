@@ -1,8 +1,8 @@
-const CACHE_NAME = 'sipandi-v2'; // Berubah ke v2 untuk memaksa pembersihan memori
+const CACHE_NAME = 'sipandi-v3'; // Naik ke v3 untuk memaksa pembersihan cache lama
 const ASSETS = [
     '/',
     '/static/css/base.css',
-    // dashboard.js sudah dihapus dan tidak perlu disimpan di memori lagi
+    '/static/js/service-worker.js'
 ];
 
 self.addEventListener('install', (e) => {
@@ -11,7 +11,7 @@ self.addEventListener('install', (e) => {
             return cache.addAll(ASSETS);
         })
     );
-    self.skipWaiting(); // Langsung aktifkan versi baru
+    self.skipWaiting();
 });
 
 self.addEventListener('activate', (e) => {
@@ -26,12 +26,31 @@ self.addEventListener('activate', (e) => {
             );
         })
     );
+    return self.clients.claim(); // Memastikan SW baru mengambil kendali semua halaman
 });
 
+// STRATEGI: Network First (Coba koneksi dulu, baru cache)
 self.addEventListener('fetch', (e) => {
+    // Abaikan permintaan Firebase/Eksternal agar tidak bentrok
+    if (e.request.url.includes('firebaseio.com') || e.request.url.includes('googleapis.com')) {
+        return;
+    }
+
     e.respondWith(
-        caches.match(e.request).then((res) => {
-            return res || fetch(e.request);
-        })
+        fetch(e.request)
+            .then((response) => {
+                // Jika sukses, simpan salinan terbaru ke cache
+                if (response && response.status === 200 && response.type === 'basic') {
+                    const responseToCache = response.clone();
+                    caches.open(CACHE_NAME).then((cache) => {
+                        cache.put(e.request, responseToCache);
+                    });
+                }
+                return response;
+            })
+            .catch(() => {
+                // Jika offline (koneksi gagal), baru ambil dari cache
+                return caches.match(e.request);
+            })
     );
 });

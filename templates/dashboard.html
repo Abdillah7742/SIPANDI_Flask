@@ -38,7 +38,7 @@
             </svg>
         </button>
          <div class="text-center">
-             <h1 id="device-name" class="text-lg font-black tracking-tight text-slate-900 uppercase i18n" data-key="title">UNIT MONITORING</h1>
+             <h1 id="device-name" class="text-lg font-black tracking-tight text-slate-900 uppercase">UNIT MONITORING</h1>
              <div class="flex items-center justify-center gap-2 mt-1">
                  <p id="device-id" class="text-[10px] text-primary font-black tracking-[0.2em] uppercase">ID: {{ device_id }}</p>
                  <div class="flex items-center gap-1.5 px-2 py-0.5 bg-slate-100 rounded-full">
@@ -47,22 +47,29 @@
                  </div>
              </div>
          </div>
-        <button onclick="toggleLanguage()" class="p-2 bg-slate-100 rounded-xl hover:bg-slate-200 transition-all flex items-center gap-2">
-            <span id="lang-text" class="text-[10px] font-black text-slate-600 uppercase tracking-widest">ID</span>
-            <span class="w-6 h-6 bg-white rounded-lg flex items-center justify-center text-xs shadow-sm">🌐</span>
-        </button>
+        <div class="w-12 h-12"></div> <!-- Spacer for balance -->
     </header>
 
-    <main class="p-6 max-w-4xl mx-auto space-y-8 mt-4">
+    <!-- Alarm Sound -->
+    <audio id="hama-alarm" loop>
+        <source src="https://assets.mixkit.co/active_storage/sfx/995/995-preview.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="auth-loading" class="fixed inset-0 z-[200] bg-slate-50 flex flex-col items-center justify-center animate__animated">
+        <div class="text-6xl animate__animated animate__bounce animate__infinite">🌾</div>
+        <p class="mt-6 text-slate-400 font-black tracking-[0.3em] uppercase text-[10px]">Memverifikasi Akses...</p>
+    </div>
+
+    <main id="main-content" class="p-6 max-w-4xl mx-auto space-y-8 mt-4 opacity-0 transition-opacity duration-700">
         
         <!-- WEATHER SECTION -->
         <section class="weather-gradient p-8 rounded-[2.5rem] text-white flex items-center justify-between shadow-xl animate__animated animate__zoomIn">
             <div>
-                <p class="text-[10px] font-black uppercase tracking-[0.3em] opacity-80 i18n" data-key="weather_title">Cuaca Tana Toraja</p>
+                <p class="text-[10px] font-black uppercase tracking-[0.3em] opacity-80">Cuaca Tana Toraja</p>
                 <div class="flex items-center gap-4 mt-2">
                     <span id="weather-temp" class="text-4xl font-black">24°</span>
                     <div>
-                        <p id="weather-desc" class="text-xs font-bold i18n" data-key="weather_sunny">Cerah Berawan</p>
+                        <p id="weather-desc" class="text-xs font-bold">Cerah Berawan</p>
                         <p id="weather-humidity" class="text-[10px] opacity-70">Lembab: 72%</p>
                     </div>
                 </div>
@@ -75,9 +82,9 @@
             <div class="flex justify-between items-center mb-10">
                  <h2 class="text-xs font-black uppercase tracking-[0.3em] text-slate-400 flex items-center gap-3">
                      <span class="p-2 bg-primary/10 rounded-xl">🦟</span> 
-                     <span class="i18n" data-key="radar_hama">Radar Hama</span>
+                     <span>Radar Hama</span>
                  </h2>
-                <span id="hama-alert" class="px-4 py-1.5 bg-primary/10 text-primary text-[10px] font-black rounded-full uppercase tracking-widest border border-primary/20 i18n" data-key="safe">Aman</span>
+                <span id="hama-alert" class="px-4 py-1.5 bg-primary/10 text-primary text-[10px] font-black rounded-full uppercase tracking-widest border border-primary/20">Aman</span>
             </div>
             
             <div class="text-center py-8">
@@ -92,7 +99,7 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Suhu Udara -->
             <article class="sensor-card glass p-8 rounded-[2.5rem] animate__animated animate__fadeInLeft" style="animation-delay: 0.1s; transition: all 0.3s;">
-                <p class="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-6 i18n" data-key="suhu_udara">Suhu Udara</p>
+                <p class="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-6">Suhu Udara</p>
                 <div class="flex items-baseline gap-2 mb-4">
                     <span id="suhu-val" class="text-5xl font-black text-slate-900">--</span>
                     <span class="text-xl font-bold text-primary italic">°C</span>
@@ -104,7 +111,7 @@
 
             <!-- Kelembapan Udara -->
             <article class="sensor-card glass p-8 rounded-[2.5rem] animate__animated animate__fadeInLeft" style="animation-delay: 0.2s; transition: all 0.3s;">
-                <p class="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-6 i18n" data-key="lembab_udara">Lembab Udara</p>
+                <p class="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-6">Lembab Udara</p>
                 <div class="flex items-baseline gap-2 mb-4">
                     <span id="humi-val" class="text-5xl font-black text-slate-900">--</span>
                     <span class="text-xl font-bold text-primary italic">%</span>
@@ -116,19 +123,19 @@
 
             <!-- Kelembapan Tanah -->
             <article class="sensor-card glass p-8 rounded-[2.5rem] animate__animated animate__fadeInLeft" style="animation-delay: 0.3s; transition: all 0.3s;">
-                <p class="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-6 i18n" data-key="kadar_air">Kadar Air Tanah</p>
+                <p class="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-6">Kadar Air Tanah</p>
                 <div class="flex items-baseline gap-2 mb-4">
                     <span id="soil-val" class="text-5xl font-black text-slate-900">--</span>
                     <span class="text-xl font-bold text-primary italic">%</span>
                 </div>
-                <p id="soil-desc" class="text-[10px] font-black text-primary uppercase tracking-widest i18n" data-key="detecting">Mendeteksi...</p>
+                <p id="soil-desc" class="text-[10px] font-black text-primary uppercase tracking-widest">Mendeteksi...</p>
             </article>
         </div>
 
         <!-- ANALYTICS CHART -->
         <section class="glass p-10 rounded-[3rem] animate__animated animate__fadeInUp" style="animation-delay: 0.4s;">
             <div class="flex justify-between items-center mb-8">
-                <h3 class="text-xs font-black uppercase tracking-[0.3em] text-slate-400 flex items-center gap-3 i18n" data-key="analytics">
+                <h3 class="text-xs font-black uppercase tracking-[0.3em] text-slate-400 flex items-center gap-3">
                     <span class="p-2 bg-primary/10 rounded-xl text-primary">📊</span> Analisis 24 Jam
                 </h3>
             </div>
@@ -145,10 +152,10 @@
                 <div class="glass p-8 rounded-[2.5rem] animate__animated animate__fadeInUp" style="animation-delay: 0.5s;">
                     <h3 class="text-xs font-black uppercase tracking-[0.3em] text-slate-400 mb-6 flex items-center gap-3">
                         <span class="p-2 bg-primary/10 rounded-xl text-primary">🔔</span> 
-                        <span class="i18n" data-key="suara_kejut">Suara Kejut</span>
+                        <span>Suara Kejut</span>
                     </h3>
                     <button id="btn-ring" onclick="triggerServo1()" 
-                        class="w-full py-5 bg-primary text-white font-black rounded-[1.5rem] shadow-xl shadow-primary/20 hover:scale-[1.03] active:scale-95 transition-all text-sm tracking-widest uppercase i18n" data-key="btn_ring">
+                        class="w-full py-5 bg-primary text-white font-black rounded-[1.5rem] shadow-xl shadow-primary/20 hover:scale-[1.03] active:scale-95 transition-all text-sm tracking-widest uppercase">
                         BUNYIKAN LONCENG
                     </button>
                 </div>
@@ -156,21 +163,21 @@
                 <div class="glass p-8 rounded-[2.5rem] animate__animated animate__fadeInUp" style="animation-delay: 0.6s;">
                      <h3 class="text-xs font-black uppercase tracking-[0.3em] text-slate-400 mb-6 flex items-center gap-3">
                          <span class="p-2 bg-primary/10 rounded-xl text-primary">🔄</span> 
-                         <span class="i18n" data-key="putar_radar">Putar Radar</span>
+                         <span>Putar Radar</span>
                      </h3>
                     <input type="range" id="servo2-slider" min="0" max="180" value="90" 
                         oninput="updateServo2(this.value)"
                         class="w-full h-2 bg-slate-100 rounded-full appearance-none cursor-pointer accent-primary">
                     <div class="flex justify-between mt-4 text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                        <span class="i18n" data-key="left">Kiri</span>
+                        <span>Kiri</span>
                         <span id="angle-val" class="text-primary text-xs font-bold">90°</span>
-                        <span class="i18n" data-key="right">Kanan</span>
+                        <span>Kanan</span>
                     </div>
                 </div>
 
                 <!-- Detection Threshold Slider -->
                 <div class="glass p-8 rounded-[2.5rem] animate__animated animate__fadeInUp" style="animation-delay: 0.65s;">
-                    <h3 class="text-xs font-black uppercase tracking-[0.3em] text-slate-400 mb-6 flex items-center gap-3 i18n" data-key="sensitivitas">
+                    <h3 class="text-xs font-black uppercase tracking-[0.3em] text-slate-400 mb-6 flex items-center gap-3">
                         <span class="p-2 bg-primary/10 rounded-xl text-primary">📏</span> Jarak Deteksi Hama
                     </h3>
                     <input type="range" id="threshold-slider" min="5" max="100" value="30" 
@@ -189,15 +196,15 @@
                 <div>
                      <h3 class="text-xs font-black uppercase tracking-[0.3em] text-slate-400 mb-6 flex items-center gap-3">
                          <span class="p-2 bg-primary/10 rounded-xl text-primary">📜</span> 
-                         <span class="i18n" data-key="weekly_report">Laporan Mingguan</span>
+                         <span>Laporan Mingguan</span>
                      </h3>
-                    <p class="text-xs text-slate-500 leading-relaxed i18n" data-key="report_desc">
+                    <p class="text-xs text-slate-500 leading-relaxed">
                         Unduh ringkasan kondisi sawah dalam format PDF untuk analisis mingguan yang lebih mendalam.
                     </p>
                 </div>
                     <button onclick="generateReportPDF()" 
                         class="mt-8 w-full py-5 border-2 border-primary text-primary font-black rounded-[1.5rem] hover:bg-primary hover:text-white transition-all text-sm tracking-widest uppercase">
-                        <span class="i18n" data-key="btn_report">UNDUH LAPORAN (PDF)</span>
+                        <span>UNDUH LAPORAN (PDF)</span>
                     </button>
             </div>
         </section>
@@ -230,17 +237,27 @@
         
         let serverTimeOffset = 0;
         let lastSeenTimestamp = 0;
+        const activeListeners = [];
 
-        // Sync Server Time
-        onValue(ref(db, ".info/serverTimeOffset"), (snapshot) => {
+        function cleanupListeners() {
+            while (activeListeners.length > 0) {
+                const unsubscribe = activeListeners.pop();
+                if (typeof unsubscribe === 'function') unsubscribe();
+            }
+        }
+
+        window.addEventListener('beforeunload', cleanupListeners);
+
+        const offsetUnsub = onValue(ref(db, ".info/serverTimeOffset"), (snapshot) => {
             serverTimeOffset = snapshot.val() || 0;
         });
+        activeListeners.push(offsetUnsub);
 
-        // Listen to Last Seen
-        onValue(ref(db, `devices/${currentDeviceId}/last_seen`), (snapshot) => {
+        const livenessUnsub = onValue(ref(db, `devices/${currentDeviceId}/last_seen`), (snapshot) => {
             lastSeenTimestamp = snapshot.val() || 0;
             updateLivenessUI();
         });
+        activeListeners.push(livenessUnsub);
 
         function updateLivenessUI() {
             const dot = document.getElementById('status-dot');
@@ -263,108 +280,45 @@
 
         setInterval(updateLivenessUI, 5000);
 
-        // --- I18N DATA ---
-        const translations = {
-            id: {
-                title: "UNIT MONITORING",
-                weather_title: "Cuaca Tana Toraja",
-                weather_sunny: "Cerah Berawan",
-                radar_hama: "Radar Hama",
-                safe: "Aman",
-                warning: "WASPADA",
-                hama_near: "HAMA DEKAT",
-                no_pest: "TIDAK ADA",
-                suhu_udara: "Suhu Udara",
-                lembab_udara: "Lembab Udara",
-                kadar_air: "Kadar Air Tanah",
-                detecting: "Mendeteksi...",
-                ideal: "Kondisi Ideal",
-                dry: "Tanah Kering",
-                wet: "Tanah Basah",
-                analytics: "Analisis 24 Jam",
-                suara_kejut: "Suara Kejut",
-                putar_radar: "Putar Radar",
-                btn_ring: "BUNYIKAN LONCENG",
-                btn_ringing: "🔔 SEDANG MENDERING...",
-                left: "Kiri",
-                right: "Kanan",
-                sensitivitas: "Jarak Deteksi Hama",
-                weekly_report: "Laporan Mingguan",
-                report_desc: "Unduh ringkasan kondisi sawah dalam format PDF untuk analisis mingguan.",
-                btn_report: "UNDUH LAPORAN (PDF)"
-            },
-             en: {
-                 title: "MONITORING UNIT",
-                 weather_title: "Weather in Toraja",
-                 weather_sunny: "Partly Cloudy",
-                 radar_hama: "Pest Radar",
-                 safe: "SAFE",
-                 warning: "WARNING",
-                 hama_near: "PEST DETECTED",
-                 no_pest: "NONE",
-                 suhu_udara: "Temperature",
-                 lembab_udara: "Humidity",
-                 kadar_air: "Soil Moisture",
-                 detecting: "Detecting...",
-                 ideal: "Ideal Condition",
-                 dry: "Dry Soil",
-                 wet: "Wet Soil",
-                 analytics: "24h Analytics",
-                 suara_kejut: "Shock Sound",
-                 putar_radar: "Radar Rotation",
-                 btn_ring: "RING THE BELL",
-                 btn_ringing: "🔔 RINGING...",
-                 left: "Left",
-                 right: "Right",
-                 sensitivitas: "Detection Distance",
-                 weekly_report: "Weekly Report",
-                 report_desc: "Download a PDF summary of the rice field condition for weekly analysis.",
-                 btn_report: "DOWNLOAD REPORT (PDF)"
-             }
-         };
-
-        let currentLang = localStorage.getItem('sipandi_lang') || 'id';
         let chart = null;
         let sensorHistory = { labels: [], suhu: [], humi: [] };
         let hamaThreshold = 30;
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
+                cleanupListeners();
                 window.location.href = "/auth";
                 return;
             }
+            
+            if ("Notification" in window) Notification.requestPermission();
+
             try {
                 const deviceDoc = await getDoc(doc(fs, `/users/${user.uid}/devices`, currentDeviceId));
+                
                 if (deviceDoc.exists()) {
                     document.getElementById('device-name').innerText = deviceDoc.data().name.toUpperCase();
+                    
+                    const loading = document.getElementById('auth-loading');
+                    const content = document.getElementById('main-content');
+                    loading.classList.add('animate__fadeOut');
+                    setTimeout(() => {
+                        loading.style.display = 'none';
+                        content.classList.remove('opacity-0');
+                    }, 500);
+
+                    updateWeather();
+                    initCharts();
+                    initializeRealtimeData();
+                } else {
+                    window.location.href = "/";
                 }
-            } catch(e) {}
-            
-            applyLanguage(currentLang);
-            updateWeather();
-            initCharts();
-            initializeRealtimeData();
-            requestNotificationPermission();
+            } catch(e) {
+                window.location.href = "/";
+            }
         });
 
-        function applyLanguage(lang) {
-            currentLang = lang;
-            localStorage.setItem('sipandi_lang', lang);
-            document.getElementById('lang-text').innerText = lang.toUpperCase();
-            document.querySelectorAll('.i18n').forEach(el => {
-                const key = el.getAttribute('data-key');
-                if (translations[lang][key]) {
-                    el.innerText = translations[lang][key];
-                }
-            });
-        }
-
-        window.toggleLanguage = () => {
-            applyLanguage(currentLang === 'id' ? 'en' : 'id');
-        };
-
         async function updateWeather() {
-            // Mock Weather for Tana Toraja
             const temps = [22, 23, 24, 25, 24];
             const rand = Math.floor(Math.random() * temps.length);
             document.getElementById('weather-temp').innerText = `${temps[rand]}°`;
@@ -372,7 +326,7 @@
             const hours = new Date().getHours();
             if (hours > 18 || hours < 6) {
                 document.getElementById('weather-icon').innerText = "🌙";
-                document.getElementById('weather-desc').innerText = currentLang === 'id' ? "Malam Cerah" : "Masero Bongi";
+                document.getElementById('weather-desc').innerText = "Malam Cerah";
             }
         }
 
@@ -418,58 +372,48 @@
             });
         }
 
-        function requestNotificationPermission() {
-            if ("Notification" in window) {
-                Notification.requestPermission();
-            }
-        }
-
         function sendNotification(title, body) {
             if (Notification.permission === "granted") {
                 new Notification(title, { icon: "/static/img/icon-192.png", body: body });
             }
         }
 
-         function initializeRealtimeData() {
-             onValue(ref(db, `devices/${currentDeviceId}/sensors`), (snapshot) => {
+        function initializeRealtimeData() {
+             const sensorsUnsub = onValue(ref(db, `devices/${currentDeviceId}/sensors`), (snapshot) => {
                  const data = snapshot.val();
                  if (data) {
-                     // Sanitisasi Suhu
                      const suhu = parseFloat(data.suhu);
-                     if (!isNaN(suhu) && suhu > -50 && suhu < 100) {
+                     if (!isNaN(suhu) && suhu > -10 && suhu < 60) {
                          document.getElementById('suhu-val').innerText = suhu.toFixed(1);
-                         document.getElementById('suhu-bar').style.width = `${Math.min(100, Math.max(0, suhu * 2))}%`;
+                         document.getElementById('suhu-bar').style.width = `${Math.min(100, Math.max(0, suhu * 1.5 + 20))}%`;
                      }
 
-                     // Sanitisasi Kelembaban
                      const humi = parseFloat(data.humidity);
                      if (!isNaN(humi) && humi >= 0 && humi <= 100) {
                          document.getElementById('humi-val').innerText = Math.round(humi);
                          document.getElementById('humi-bar').style.width = `${humi}%`;
                      }
 
-                     // Update Chart (hanya jika keduanya valid)
-                     if (!isNaN(suhu) && !isNaN(humi)) {
+                     if (!isNaN(suhu) && !isNaN(humi) && suhu > -10 && suhu < 60) {
                          updateChart(suhu, humi);
                      }
 
-                     // Sanitisasi Tanah
                      const soil = parseInt(data.soil);
                      if (!isNaN(soil)) {
                          const sVal = Math.min(100, Math.max(0, soil));
                          document.getElementById('soil-val').innerText = sVal;
-                         const desc = document.getElementById('soil-desc');
-                         if (sVal < 30) { desc.innerText = translations[currentLang].dry; }
-                         else if (sVal > 80) { desc.innerText = translations[currentLang].wet; }
-                         else { desc.innerText = translations[currentLang].ideal; }
+                         const descEl = document.getElementById('soil-desc');
+                         if (sVal < 30) { descEl.innerText = "Tanah Kering"; }
+                         else if (sVal > 80) { descEl.innerText = "Tanah Basah"; }
+                         else { descEl.innerText = "Kondisi Ideal"; }
                      }
                  }
              });
+             activeListeners.push(sensorsUnsub);
 
             let lastDist = 100;
 
-            // Load saved settings
-            onValue(ref(db, `devices/${currentDeviceId}/settings/hama_threshold`), (snapshot) => {
+            const thresholdUnsub = onValue(ref(db, `devices/${currentDeviceId}/settings/hama_threshold`), (snapshot) => {
                 const val = snapshot.val();
                 if (val !== null) {
                     hamaThreshold = val;
@@ -477,16 +421,18 @@
                     document.getElementById('threshold-val').innerText = `${val}cm`;
                 }
             });
+            activeListeners.push(thresholdUnsub);
 
-            onValue(ref(db, `devices/${currentDeviceId}/commands/servo2_angle`), (snapshot) => {
+            const servoUnsub = onValue(ref(db, `devices/${currentDeviceId}/commands/servo2_angle`), (snapshot) => {
                 const val = snapshot.val();
                 if (val !== null) {
                     document.getElementById('servo2-slider').value = val;
                     document.getElementById('angle-val').innerText = `${val}°`;
                 }
             });
+            activeListeners.push(servoUnsub);
 
-            onValue(ref(db, `devices/${currentDeviceId}/hama`), (snapshot) => {
+            const hamaUnsub = onValue(ref(db, `devices/${currentDeviceId}/hama`), (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     const dist = data.distance || 0;
@@ -495,26 +441,36 @@
                     const alertEl = document.getElementById('hama-alert');
                     
                     if (dist > 0 && dist < hamaThreshold) {
-                        statusEl.innerText = translations[currentLang].warning;
+                        statusEl.innerText = "WASPADA";
                         statusEl.classList.add('animate__shakeX', 'text-red-600');
-                        alertEl.innerText = translations[currentLang].hama_near;
+                        alertEl.innerText = "HAMA DEKAT";
                         alertEl.className = "px-4 py-1.5 bg-red-500/10 text-red-500 text-[10px] font-black rounded-full uppercase tracking-widest border border-red-500/20";
                         
+                        document.body.classList.add('ring-8', 'ring-red-500/30', 'ring-inset');
+                        const alarm = document.getElementById('hama-alarm');
+                        if (alarm && alarm.paused) alarm.play().catch(e => {});
+
                         if (lastDist >= hamaThreshold) {
-                            sendNotification("WASPADA HAMA!", `Terdeteksi hama pada jarak ${dist}cm (Batas: ${hamaThreshold}cm)`);
+                            sendNotification("WASPADA HAMA!", `Terdeteksi hama pada jarak ${dist}cm`);
                         }
                     } else {
-                        statusEl.innerText = translations[currentLang].no_pest;
+                        statusEl.innerText = "TIDAK ADA";
                         statusEl.classList.remove('animate__shakeX', 'text-red-600');
-                        alertEl.innerText = translations[currentLang].safe;
+                        alertEl.innerText = "AMAN";
                         alertEl.className = "px-4 py-1.5 bg-primary/10 text-primary text-[10px] font-black rounded-full uppercase tracking-widest border border-primary/20";
+                        
+                        document.body.classList.remove('ring-8', 'ring-red-500/30', 'ring-inset');
+                        const alarm = document.getElementById('hama-alarm');
+                        if (alarm) { alarm.pause(); alarm.currentTime = 0; }
                     }
                     lastDist = dist;
                 }
             });
+            activeListeners.push(hamaUnsub);
         }
 
         function updateChart(suhu, humi) {
+            if (!chart) return;
             const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             if (chart.data.labels.length > 20) {
                 chart.data.labels.shift();
@@ -526,18 +482,14 @@
             chart.data.datasets[1].data.push(humi);
             chart.update('none');
 
-            // Save to sensorHistory for PDF
             sensorHistory.labels.push(now);
             sensorHistory.suhu.push(suhu);
             sensorHistory.humi.push(humi);
         }
 
-         window.generateReportPDF = async () => {
+        window.generateReportPDF = async () => {
              const { jsPDF } = window.jspdf;
              const doc = new jsPDF();
-             const statusEl = document.getElementById('status');
-             
-             // 1. Fetch History from Firebase
              const historyRef = query(ref(db, `devices/${currentDeviceId}/history`), limitToLast(50));
              const snapshot = await get(historyRef);
              let historyData = [];
@@ -549,51 +501,37 @@
                      const date = new Date(parseInt(key)).toLocaleString('id-ID', { 
                          day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' 
                      });
-                     historyData.push([
-                         date, 
-                         `${item.suhu}°C`, 
-                         `${item.humidity}%`, 
-                         `${item.soil}%`, 
-                         item.hama_detected ? "YA" : "TIDAK"
-                     ]);
+                     historyData.push([date, `${item.suhu}°C`, `${item.humidity}%`, `${item.soil}%`, item.hama_detected ? "YA" : "TIDAK"]);
                  });
              }
 
-             // 2. Metadata & Header
-             doc.setFillColor(92, 169, 4); // SIPANDI Green
+             doc.setFillColor(92, 169, 4);
              doc.rect(0, 0, 210, 40, 'F');
-             
              doc.setFontSize(24);
              doc.setTextColor(255, 255, 255);
              doc.text("SIPANDI WEEKLY REPORT", 20, 25);
-             
              doc.setFontSize(10);
              doc.text(`Device ID: ${currentDeviceId} | Printed: ${new Date().toLocaleString()}`, 20, 33);
              
-             // 3. Summary Section
              doc.setTextColor(0, 0, 0);
              doc.setFontSize(14);
              doc.text("Ringkasan Kondisi", 20, 55);
-             
              const avgSuhu = (sensorHistory.suhu.reduce((a, b) => a + b, 0) / sensorHistory.suhu.length || 0).toFixed(1);
              const avgHumi = (sensorHistory.humi.reduce((a, b) => a + b, 0) / sensorHistory.humi.length || 0).toFixed(1);
-             
              doc.setFontSize(11);
              doc.text(`- Rata-rata Suhu Terakhir: ${avgSuhu} °C`, 25, 65);
              doc.text(`- Rata-rata Kelembaban Terakhir: ${avgHumi} %`, 25, 72);
              doc.text(`- Status Lahan: ${parseFloat(avgHumi) > 40 ? "SUBUR" : "KERING"}`, 25, 79);
 
-             // 4. Data Table (Actual History)
              doc.setFontSize(14);
              doc.text("Riwayat Aktivitas & Sensor", 20, 95);
-             
              if (historyData.length > 0) {
                  doc.autoTable({
                      startY: 105,
                      head: [['Waktu', 'Suhu', 'Lembab', 'Tanah', 'Hama?']],
                      body: historyData,
                      theme: 'grid',
-                     headStyles: { fillStyle: [92, 169, 4] }, // Green header
+                     headStyles: { fillStyle: [92, 169, 4] },
                      styles: { fontSize: 9 }
                  });
              } else {
@@ -601,20 +539,22 @@
                  doc.setTextColor(150);
                  doc.text("Belum ada riwayat data tercatat di database.", 25, 110);
              }
-             
-             // 5. Footer
-             doc.setFontSize(9);
-             doc.setTextColor(100);
-             doc.text("Laporan ini dihasilkan secara otomatis oleh sistem SIPANDI.", 20, 285);
-             
              doc.save(`SIPANDI-Weekly-Report-${currentDeviceId}.pdf`);
-         };
+        };
 
         window.triggerServo1 = () => {
-            set(ref(db, `devices/${currentDeviceId}/commands/servo1`), { action: 'ring', timestamp: Date.now() });
             const btn = document.getElementById('btn-ring');
-            btn.innerText = translations[currentLang].btn_ringing;
-            setTimeout(() => btn.innerText = translations[currentLang].btn_ring, 2000);
+            btn.innerText = "🔔 SEDANG MENDERING...";
+            btn.classList.add('bg-secondary');
+            
+            set(ref(db, `devices/${currentDeviceId}/commands/servo1_trigger`), true)
+                .then(() => {
+                    setTimeout(() => {
+                        set(ref(db, `devices/${currentDeviceId}/commands/servo1_trigger`), false);
+                        btn.innerText = "BUNYIKAN LONCENG";
+                        btn.classList.remove('bg-secondary');
+                    }, 2000);
+                });
         };
 
         window.updateServo2 = (val) => {

@@ -1,0 +1,29 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 1. Aturan untuk Koleksi User
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      // Sub-koleksi devices milik user
+      match /devices/{deviceId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+    
+    // 2. Aturan untuk Koleksi Global registered_devices
+    match /registered_devices/{deviceId} {
+      // Siapapun yang login bisa membaca status pendaftaran (untuk cek kepemilikan)
+      allow read: if request.auth != null;
+      
+      // Hanya bisa menulis/mendaftarkan jika alat belum ada pemiliknya
+      // ATAU jika dia adalah pemilik lamanya (untuk update)
+      allow write: if request.auth != null && (
+        !exists(/databases/$(database)/documents/registered_devices/$(deviceId)) ||
+        resource.data.owner_uid == request.auth.uid
+      );
+    }
+  }
+}
